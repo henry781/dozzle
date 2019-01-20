@@ -1,6 +1,6 @@
 {
  "name": "dozzle",
- "version": "1.5.7",
+ "version": "1.5.8",
  "description": "",
  "main": "index.js",
  "scripts": {
@@ -24,8 +24,10 @@
  },
  "homepage": "https://github.com/amir20/dozzle#readme",
  "dependencies": {
+  "ansi-to-html": "^0.6.9",
   "bulma": "^0.7.2",
   "date-fns": "^2.0.0-alpha.25",
+  "pino-pretty": "^2.5.0",
   "vue": "^2.5.21",
   "vue-headful": "^2.0.1",
   "vue-router": "^3.0.2"

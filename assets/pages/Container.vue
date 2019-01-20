@@ -2,7 +2,10 @@
   <div class="is-fullheight">
     <ul ref="events" class="events">
       <li v-for="item in messages" class="event" :key="item.key">
-        <span class="date">{{ item.dateRelative }}</span> <span class="text">{{ item.message }}</span>
+        <div v-if="item.html" v-html="item.html" style="white-space: pre;"></div>
+        <div v-else>
+          <span class="date">{{ item.dateRelative }}</span> <span class="text">{{ item.message }}</span>
+        </div>
       </li>
     </ul>
     <scrollbar-notification :messages="messages"></scrollbar-notification>
@@ -13,20 +16,54 @@
 <script>
 import { formatRelative } from "date-fns";
 import ScrollbarNotification from "../components/ScrollbarNotification";
+const prettyFactory = require("pino-pretty");
+const Convert = require("ansi-to-html");
 
 let es = null;
 let nextId = 0;
+
+const pretty = prettyFactory({
+  colorize: true,
+  translateTime: true,
+  errorLikeObjectKeys: ["err", "error"]
+});
+
+const convert = new Convert({
+  newline: true
+});
+
 const parseMessage = data => {
   const date = new Date(data.substring(0, 30));
   const dateRelative = formatRelative(date, new Date());
   const message = data.substring(30);
   const key = nextId++;
+  let html;
+
+  if (isStringJson(message)) {
+    html = parsePinoMessage(message);
+  }
+
   return {
     key,
     date,
     dateRelative,
-    message
+    message,
+    html
   };
+};
+
+const isStringJson = content => {
+  try {
+    JSON.parse(content);
+  } catch (e) {
+    return false;
+  }
+  return true;
+};
+
+const parsePinoMessage = message => {
+  const ansi = pretty(message);
+  return convert.toHtml(ansi);
 };
 
 export default {
